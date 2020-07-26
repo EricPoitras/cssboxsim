@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Required meta tags -->
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+		<!-- Bootstrap CSS -->
+		<link
+			rel="stylesheet"
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+			integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+			crossorigin="anonymous"
+		/>
+		<link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css">
+        <script type="text/javascript" src="https://mbostock.github.com/d3/d3.js?1.27.2"></script>
+        <script type="text/javascript" src="https://mbostock.github.com/d3/d3.layout.js?1.27.2"></script>
+		<title>CSSBoxSim</title>
+        <style>
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 4.5px;
+}
+</style>
+	</head>
+	<body>
+		<div class="container-fluid">
+			<div id="area-header" class="row">
+				<div class="col-12 pt-2">
+					<h4><span class="text-primary">CSSBox</span>Sim</h4>
+				</div>
+			</div>
+			<div id="area-main" class="row">
+				<div class="col-6">
+                    <h6>Instructions</h6>
+                    <p>The CSS Grid Layout Module offers a grid-based layout system, with rows and columns, making it easier to design web pages without having to use floats and positioning.</p>
+                    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                      <div class="btn-group mr-2" role="group" aria-label="First group">
+                        <button type="button" class="btn btn-primary">Previous</button>
+                        <button type="button" class="btn btn-primary">Next</button>
+                      </div>
+                      <div class="btn-group mr-2" role="group" aria-label="Second group">
+                        <button type="button" class="btn btn-primary">Run</button>
+                        <button type="button" class="btn btn-primary">Hint</button>
+                      </div>
+                    </div>
+                    <h6 class="mt-2">Properties</h6>
+				    <div id="viz"></div>
+                    <h6 class="mt-2">Editor</h6>
+                    <div id="csseditor"></div>
+				</div>
+				<div class="col-6">
+                    <div class="text-center">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                          <button type="button" class="btn btn-outline-secondary"><i class="fa fa-desktop" aria-hidden="true"></i> Desktop</button>
+                          <button type="button" class="btn btn-outline-secondary"><i class="fa fa-tablet" aria-hidden="true"></i> Tablet</button>
+                          <button type="button" class="btn btn-outline-secondary"><i class="fa fa-mobile" aria-hidden="true"></i> Mobile</button>
+                        </div>
+                    </div>
+                    <div style="background-color: gray; border-radius: 5px; height: 5px; margin-top: 5px;"></div>
+                    <div id="parent" class="design_area grid-container">
+                        <span class="text-secondary">.grid-container</span><br><br>
+                        <div class="children d-inline-block text-secondary" style="padding:50px;border: 1px solid gray;">.grid-item</div>
+                    </div>
+				</div>
+			</div>
+		</div>
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script
+			src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+			integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+			integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+			integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+			crossorigin="anonymous"
+		></script>
+		<!-- Text Editor -->
+		<script src="https://unpkg.com/codeflask/build/codeflask.min.js"></script>
+		<!-- Esprima - Code parser -->
+		<script src="https://cdn.jsdelivr.net/npm/esprima@4.0.1/dist/esprima.min.js"></script>
+		<!-- Escodegen - Code generator -->
+		<script src="js/escodegen.browser.min.js"></script>
+		<script src="js/variable.js"></script>
+        
+        <script type="text/javascript">
+
+      var treeData = {"name" : "", "children" : [
+{"name" : "Box" },
+{"name" : "Flexbox" },
+{"name" : "Grid", "children": [
+{"name" : "Container"}, 
+{"name" : "Item" }
+] }
+      ]};
+
+      var vis = d3.select("#viz").append("svg:svg")
+.attr("width", 500)
+.attr("height", 300)
+.append("svg:g")
+.attr("transform", "translate(40, 0)");
+
+      var tree = d3.layout.tree()
+.size([300,300]);
+
+      var diagonal = d3.svg.diagonal()
+.projection(function(d) { return [d.y, d.x]; });
+
+      var nodes = tree.nodes(treeData);
+      var link = vis.selectAll("pathlink")
+.data(tree.links(nodes))
+.enter().append("svg:path")
+.attr("class", "link")
+.attr("d", diagonal);
+
+      var node = vis.selectAll("g.node")
+.data(nodes)
+.enter().append("svg:g")
+.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+
+      node.append("svg:circle")
+.attr("r", 4.5);
+
+      node.append("svg:text")
+.attr("dx", function(d) { return d.children ? -8 : 8; })
+.attr("dy", 3)
+.attr("text-anchor", function(d) { return d.children ? "end" : "start"; })
+.text(function(d) { return d.name; });
+
+    </script>
+	</body>
+</html>
